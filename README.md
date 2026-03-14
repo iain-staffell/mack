@@ -12,13 +12,31 @@ Currently, connectors are implemented for:
 - [World Bank Indicators](https://datahelpdesk.worldbank.org/knowledgebase/articles/889386-developer-information-overview)
 - [Renewables.ninja](https://renewables.ninja)
 
+Repository documentation:
+- [Extending MAC](docs/extending-mac.md)
+- [Connector reference index](docs/connectors/index.md)
+- [World Bank connector reference](docs/connectors/world_bank.md)
+- [Renewables.ninja connector reference](docs/connectors/renewables_ninja.md)
 
-## Example request formats
+
+## Quick start guide
+
+You can make your first API calls with just two lines of code.  
+
+Download this repo and then run:
+
+```r
+source("path/to/main.R")
+
+uk_gdp <- run_mac('path/to/examples/example_world_bank_indicators.yaml')
+```
+
+This will load up MAC, read in an example call to the World Bank Indicators API and save the results with structured metadata to `uk_gdp`.  `uk_gdp$data` will contain a list giving the UK's GDP (in local currency) from 2010 through to 2024. 
 
 
-### list() objects
+### Running with list() objects
 
-You can run a request from an in-memory list, returning the result object as a list
+You can run a request from an in-memory list, returning the result object as a list.  This code yields the same result as above:
 
 ```r
 request <- list(
@@ -33,9 +51,9 @@ request <- list(
 result <- run_mac(request)
 ```
 
-### YAML input/output
+### Running with YAML input/output
 
-You can also run a request saved in a YAML file, and save the output to YAML:
+The request used in the first example is defined by a simple YAML file structure:
 
 `request.yaml`:
 ```yaml
@@ -52,12 +70,12 @@ request:
     file: outputs/gbr_gdp.yaml
 ```
 
-Then call `result <- run_mac('request.yaml')`
+By defining the output block, calling `run_mac()` with this input file will save your results as YAML to disk.
 
 
-### JSON input/output
+### Running with JSON input/output
 
-Or the same with JSON:
+The same is possible with JSON input and output:
 
 `request.json`:
 ```json
@@ -77,10 +95,10 @@ Or the same with JSON:
 }
 ```
 
-Then call `result <- run_mac('request.json')`
+Calling `run_mac()` with this input file will yield the same data as above, but save in a different format.
 
 
-## Standard output object
+# Standard output object
 
 All connectors return the same top-level structure:
 - `schema_version` (set by dispatcher)
@@ -129,31 +147,22 @@ For example:
 
 ## Available Connectors
 
-### World Bank Indicators
+Two connectors are currently available.  A detailed guide has been written on how to [extend MAC by writing connectors to additional APIs](docs/_extending_mac.md).
+
+
+### [World Bank Indicators](docs/world_bank.md)
 
 The World Bank Indicators connector provides quick access to development and infrastructure metrics, for example, GDP (`NY.GDP.MKTP.KD`), GDP growth (`NY.GDP.MKTP.KD.ZG`), electric power consumption (`EG.USE.ELEC.KH`), access to electricity (`EG.ELC.ACCS.ZS`), access to clean fuels and technologies for cooking (`EG.CFT.ACCS.ZS`), electricity transmission and distribution losses (`EG.ELC.LOSS.ZS`), and the electricity generation mix from coal (`EG.ELC.COAL.ZS`), gas (`EG.ELC.NGAS.ZS`), nuclear (`EG.ELC.NUCL.ZS`), hydro (`EG.ELC.HYRO.ZS`), and non-hydro renewables (`EG.ELC.RNWX.ZS`). Indicators are typically annual country-aggregates, available from 1960 (with better availability from 1990 onwards). 
 
-### Renewables.ninja
+### [Renewables.ninja](docs/renewables_ninja.md)
 
 The Renewables.ninja connector provides quick access to weather-driven wind and solar generation profiles which capture the real-world spatial and temporal variation in output. Several individual locations can be simulated within a single request, and aggregated together to form zonal or regional outputs.  The wind and solar site configuration (technology, hub height, orientation) can be specified, with standard defaults applied if none are given.  Simulations are available at hourly resolution from 1980 to 2024.
 
 Renewables time series are returned in a column-oriented `data` structure.  Results can be requested for an individual site, or the sum across several sites.
 
+### Authentication
 
-## Usage
-
-From repo root:
-
-```r
-source("main.R")
-
-result <- run_mac('path/to/request.yaml')
-```
-
-
-## Secrets
-
-Some APIs require authentication, currently Renewables.ninja.  This is handled by storing your tokens inside:
+Some APIs require authentication, for example, Renewables.ninja.  This is handled by storing your tokens inside:
 - `config/secrets.yaml`
 
 Template:
@@ -180,17 +189,6 @@ Testing:
 - API failure: connector-specific error message with HTTP status when available.
 - Missing data values: preserved as `NULL`/`NA` in normalized output where appropriate.
 
-## Extending with new connectors
-
-Follow the connector contract:
-
-```r
-validate_<connector>_params(params)
-fetch_<connector>(params)
-normalize_<connector>_result(raw_result, params)
-```
-
-Register routing logic in `R/broker_fetch.R`.
 
 ## License
 
@@ -198,4 +196,4 @@ BSD 3-Clause.
 
 ## Contact
 
-[Iain Staffell](mailto:i.staffell@imperial.ac.uk)
+[Iain Staffell](mailto:i.staffell@imperial.ac.uk), Imperial College London

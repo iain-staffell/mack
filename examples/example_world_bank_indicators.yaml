@@ -1,0 +1,11 @@
+request:
+  source: world_bank
+  params:
+    country: GBR
+    indicator: NY.GDP.MKTP.KD
+    years:
+      - 2010
+      - 2024
+  output:
+    format: yaml
+    file: outputs/gbr_gdp.yaml
