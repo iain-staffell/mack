@@ -1,0 +1,4 @@
+config/secrets.yaml
+outputs/*
+!outputs/.gitkeep
+
