@@ -9,14 +9,8 @@ MAC is a lightweight connector written in R.  It fetches data from external APIs
 3. Returns the output as a list, and optionally writes it to JSON or YAML.
 
 Currently, connectors are implemented for:
-- [World Bank Indicators](https://datahelpdesk.worldbank.org/knowledgebase/articles/889386-developer-information-overview)
-- [Renewables.ninja](https://renewables.ninja)
-
-Repository documentation:
-- [Extending MAC](docs/extending-mac.md)
-- [Connector reference index](docs/connectors/index.md)
-- [World Bank connector reference](docs/connectors/world_bank.md)
-- [Renewables.ninja connector reference](docs/connectors/renewables_ninja.md)
+- [World Bank Indicators](docs/world_bank.md)
+- [Renewables.ninja](docs/renewables_ninja.md)
 
 
 ## Quick start guide
@@ -147,7 +141,9 @@ For example:
 
 ## Available Connectors
 
-Two connectors are currently available.  A detailed guide has been written on how to [extend MAC by writing connectors to additional APIs](docs/_extending_mac.md).
+Two connectors are currently available.  
+
+A detailed guide has been written on how to [extend MAC by writing connectors to additional APIs](docs/_extending_mac.md).
 
 
 ### [World Bank Indicators](docs/world_bank.md)
