@@ -8,7 +8,7 @@ Last reviewed: 2026-03-14
 
 ## What This Connector Does
 
-The World Bank connector retrieves indicator time series from the World Bank Indicators API v2 for a single country and one or more indicators. It validates the request, fetches all pages of results, and normalizes the response into MAC's shared top-level output object.
+The World Bank connector retrieves indicator time series from the World Bank Indicators API v2 for a single country and one or more indicators. It validates the request, fetches all pages of results, and normalizes the response into MACK's shared top-level output object.
 
 The current implementation is aimed at country-indicator time series. It is well suited to requests such as GDP, electricity consumption, electricity access, and other development indicators already exposed through the World Bank API.
 
@@ -21,9 +21,9 @@ Official World Bank developer documentation:
 - https://datahelpdesk.worldbank.org/knowledgebase/articles/898581-api-basic-call-structures
 - https://datahelpdesk.worldbank.org/knowledgebase/articles/898599-indicator-api-queries
 
-## Endpoint Used by MAC
+## Endpoint Used by MACK
 
-MAC builds requests against the Indicators API v2 using the following path shape:
+MACK builds requests against the Indicators API v2 using the following path shape:
 
 `https://api.worldbank.org/v2/country/{country}/indicator/{indicator1;indicator2;...}`
 
@@ -40,23 +40,23 @@ If more than one page is returned, the connector continues requesting pages unti
 
 No authentication is required. The World Bank documentation states that API keys and other authentication methods are no longer necessary for the Indicators API.
 
-## Parameters Accepted by MAC
+## Parameters Accepted by MACK
 
 The connector currently validates these parameters:
 
-- `country`: a single three-letter code, documented in MAC as an ISO3 country code
+- `country`: a single three-letter code, documented in MACK as an ISO3 country code
 - `indicator`: a non-empty character vector of one or more indicator codes
 - `years`: a numeric vector of length two giving start year and end year
 - `per_page`: optional positive integer
 
 Additional notes:
 
-- MAC supports multiple indicators in one request.
-- MAC follows the upstream API convention of joining multiple indicators with `;`.
-- The World Bank documentation states that a maximum of 60 indicators can be used in one request; the MAC validator enforces the same limit.
-- If `per_page` is not supplied, MAC currently requests 1000 rows per page.
+- MACK supports multiple indicators in one request.
+- MACK follows the upstream API convention of joining multiple indicators with `;`.
+- The World Bank documentation states that a maximum of 60 indicators can be used in one request; the MACK validator enforces the same limit.
+- If `per_page` is not supplied, MACK currently requests 1000 rows per page.
 
-## Output Returned by MAC
+## Output Returned by MACK
 
 The connector returns a row-based `data` payload. Each row contains:
 
@@ -65,7 +65,7 @@ The connector returns a row-based `data` payload. Each row contains:
 - `year`
 - `value`
 
-The surrounding MAC output also includes:
+The surrounding MACK output also includes:
 
 - `query`: the final URL and query parameters used
 - `source_metadata`: page count and page metadata from the upstream API
@@ -107,9 +107,9 @@ For most World Bank Data Catalog datasets, the documented public licence is Crea
 
 ## Known Caveats
 
-- MAC currently documents `country` as a single three-letter country code and does not expose a multi-country request interface.
-- The connector is focused on the main indicator data endpoint. It does not currently expose the wider set of World Bank metadata and source-selection endpoints through a dedicated MAC interface.
-- MAC captures unit information, but it does not currently pull through the fuller indicator metadata that the World Bank API can also provide.
+- MACK currently documents `country` as a single three-letter country code and does not expose a multi-country request interface.
+- The connector is focused on the main indicator data endpoint. It does not currently expose the wider set of World Bank metadata and source-selection endpoints through a dedicated MACK interface.
+- MACK captures unit information, but it does not currently pull through the fuller indicator metadata that the World Bank API can also provide.
 - The connector preserves the order returned by the API rather than applying its own sorting step.
 
 ## Example Request
@@ -124,7 +124,7 @@ request <- list(
   )
 )
 
-result <- run_mac(request)
+result <- run_mack(request)
 ```
 
 ## External Links

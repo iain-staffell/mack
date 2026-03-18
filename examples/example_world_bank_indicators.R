@@ -2,7 +2,7 @@
 #
 # Runnable World Bank example:
 # - loads broker runtime through main.R
-# - executes run_mac()
+# - executes run_mack()
 # - writes output to outputs/
 
 if (!requireNamespace("here", quietly = TRUE)) {
@@ -25,7 +25,7 @@ request <- list(
   )
 )
 
-result <- run_mac(request)
+result <- run_mack(request)
 cat("World Bank example completed.\n")
 cat("Rows returned:", length(result$data), "\n")
 cat("Output file:", request$output$file, "\n")

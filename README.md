@@ -1,8 +1,8 @@
-# MOSAIC API Connector (MAC)
+# MOSAIC API Connector Kit (MACK)
 
-MAC is a lightweight connector written in R.  It fetches data from external APIs and exports simple, structured results to JSON or YAML.  It is intended to help standardise and streamline the process of gathering data inputs for energy systems models.
+MACK is a lightweight connector written in R.  It fetches data from external APIs and exports simple, structured results to JSON or YAML.  It is intended to help standardise and streamline the process of gathering data inputs for energy systems models.
 
-## What MAC does
+## What MACK does
 
 1. Accepts and validates a structured request (what `source` to connect to, what `params` to pass to it, optionally what file to write `output` to).
 2. Routes this to a connector which calls the API, parses the response and normalises output.
@@ -20,12 +20,12 @@ You can make your first API calls with just two lines of code.
 Download this repo and then run:
 
 ```r
-source("path/to/main.R")
+source("path/to/mack/main.R")
 
-uk_gdp <- run_mac('path/to/examples/example_world_bank_indicators.yaml')
+uk_gdp <- run_mack('path/to/mack/examples/example_world_bank_indicators.yaml')
 ```
 
-This will load up MAC, read in an example call to the World Bank Indicators API and save the results with structured metadata to `uk_gdp`.  `uk_gdp$data` will contain a list giving the UK's GDP (in local currency) from 2010 through to 2024. 
+This will load up MACK, read in an example call to the World Bank Indicators API and save the results with structured metadata to `uk_gdp`.  `uk_gdp$data` will contain a list giving the UK's GDP (in local currency) from 2010 through to 2024. 
 
 
 ### Running with list() objects
@@ -35,14 +35,14 @@ You can run a request from an in-memory list, returning the result object as a l
 ```r
 request <- list(
   source = "world_bank",            # from the world bank indicators
-  params = list(
+  params = list(                    # ...
     indicator = "NY.GDP.MKTP.KD",   # request GDP
     country = "GBR",                # for the United Kingdom
     years = c(2010, 2024)           # from 2010 to 2024
   )
 )
 
-result <- run_mac(request)
+result <- run_mack(request)
 ```
 
 ### Running with YAML input/output
@@ -64,7 +64,7 @@ request:
     file: outputs/gbr_gdp.yaml
 ```
 
-By defining the output block, calling `run_mac()` with this input file will save your results as YAML to disk.
+By defining the output block, calling `run_mack()` with this input file will save your results as YAML to disk.
 
 
 ### Running with JSON input/output
@@ -89,7 +89,7 @@ The same is possible with JSON input and output:
 }
 ```
 
-Calling `run_mac()` with this input file will yield the same data as above, but save in a different format.
+Calling `run_mack()` with this input file will yield the same data as above, but save in a different format.
 
 
 # Standard output object
@@ -143,7 +143,7 @@ For example:
 
 Two connectors are currently available.  
 
-A detailed guide has been written on how to [extend MAC by writing connectors to additional APIs](docs/_extending_mac.md).
+A detailed guide has been written on how to [extend MACK by writing connectors to additional APIs](docs/_extending_mack.md).
 
 
 ### [World Bank Indicators](docs/world_bank.md)

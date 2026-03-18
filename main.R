@@ -11,7 +11,7 @@
   }
 )
 
-# Validate whether a path looks like the MAC project root.
+# Validate whether a path looks like the MACK project root.
 is_valid_root_path <- function(path) {
   if (is.null(path) || !is.character(path) || length(path) != 1L || is.na(path) || !nzchar(path)) {
     return(FALSE)
@@ -137,7 +137,7 @@ load_broker_runtime()
 #' @param secrets_path Character path to YAML secrets file. If `NULL`,
 #' defaults to `config/secrets.yaml` relative to project root.
 #' @return A standard broker output object as a named list.
-run_mac <- function(request, secrets_path = NULL) {
+run_mack <- function(request, secrets_path = NULL) {
   root_path <- NULL
   request_object <- NULL
   output <- NULL

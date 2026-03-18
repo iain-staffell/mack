@@ -10,7 +10,7 @@ Last reviewed: 2026-03-14
 
 The Renewables.ninja connector retrieves simulated wind or solar generation profiles for one or more sites. It makes one upstream API request per site, parses the returned time series, and then either returns site-level data or sums the sites together depending on the `sum_sites` setting.
 
-The current MAC implementation uses the site-level API rather than the country-level pre-aggregated endpoints.
+The current MACK implementation uses the site-level API rather than the country-level pre-aggregated endpoints.
 
 ## Upstream API
 
@@ -21,22 +21,22 @@ Official Renewables.ninja documentation:
 - https://www.renewables.ninja/documentation/datasets
 - https://www.renewables.ninja/about
 
-## Endpoint Used by MAC
+## Endpoint Used by MACK
 
-MAC currently uses the site-level endpoints:
+MACK currently uses the site-level endpoints:
 
 - `https://www.renewables.ninja/api/data/wind` when `technology = "wind"`
 - `https://www.renewables.ninja/api/data/pv` when `technology = "solar"`
 
-Each site is requested separately. MAC records both the normalized request and the per-site API requests in the returned `query` field.
+Each site is requested separately. MACK records both the normalized request and the per-site API requests in the returned `query` field.
 
-Although Renewables.ninja also documents country-level endpoints, the current MAC connector does not use them.
+Although Renewables.ninja also documents country-level endpoints, the current MACK connector does not use them.
 
 ## Authentication
 
-Renewables.ninja supports anonymous access and token-based access, but the current MAC implementation expects a token and reads it from `config/secrets.yaml`.
+Renewables.ninja supports anonymous access and token-based access, but the current MACK implementation expects a token and reads it from `config/secrets.yaml`.
 
-The request header used by MAC is:
+The request header used by MACK is:
 
 `Authorization: Token <your_token_here>`
 
@@ -47,7 +47,7 @@ renewables_ninja:
   token: "YOUR_TOKEN_HERE"
 ```
 
-## Parameters Accepted by MAC
+## Parameters Accepted by MACK
 
 The connector currently requires:
 
@@ -68,9 +68,9 @@ The connector currently validates these optional parameters when present:
 - `azim`
 - `raw`
 
-In addition, the connector will pass through other parameters that are supplied in `params` and are not used internally for MAC orchestration. In practice this means upstream parameters such as `dataset`, `format`, `header`, `local_time`, `mean`, or `tracking` can be included in the request, but MAC does not currently validate all of them locally.
+In addition, the connector will pass through other parameters that are supplied in `params` and are not used internally for MACK orchestration. In practice this means upstream parameters such as `dataset`, `format`, `header`, `local_time`, `mean`, or `tracking` can be included in the request, but MACK does not currently validate all of them locally.
 
-## Defaults Applied by MAC
+## Defaults Applied by MACK
 
 The connector applies several defaults before sending the upstream request:
 
@@ -90,7 +90,7 @@ For solar requests:
 - `azim = 180`
 - `raw = FALSE`
 
-## Output Returned by MAC
+## Output Returned by MACK
 
 The connector returns a column-oriented `data` payload.
 
@@ -109,14 +109,14 @@ If `sum_sites = TRUE`, the output columns are:
 
 The result also includes:
 
-- `query`: normalized request parameters plus the site-level API requests MAC actually made
+- `query`: normalized request parameters plus the site-level API requests MACK actually made
 - `source_metadata`: one metadata block per site
 
-The connector can parse either JSON or CSV responses from the upstream API, but MAC currently requests JSON by default.
+The connector can parse either JSON or CSV responses from the upstream API, but MACK currently requests JSON by default.
 
 ## Units and Dimensions
 
-Renewables.ninja documents site-level electricity output in kW for the standard point API output format. MAC extracts unit information from upstream metadata when present.
+Renewables.ninja documents site-level electricity output in kW for the standard point API output format. MACK extracts unit information from upstream metadata when present.
 
 The connector currently sets:
 
@@ -140,7 +140,7 @@ According to the official Renewables.ninja documentation reviewed for this page:
 
 The same documentation states that custom simulations currently run through the end of 2024.
 
-Because MAC makes one upstream API request per site, a single MAC request with multiple sites will consume multiple upstream requests against those limits.
+Because MACK makes one upstream API request per site, a single MACK request with multiple sites will consume multiple upstream requests against those limits.
 
 ## Data Licence and Attribution
 
@@ -155,11 +155,11 @@ Official reference pages:
 
 ## Known Caveats
 
-- MAC currently requires a token even though the upstream API can also be accessed anonymously.
-- MAC makes one upstream request per site, so large multi-site jobs will hit rate limits faster.
+- MACK currently requires a token even though the upstream API can also be accessed anonymously.
+- MACK makes one upstream request per site, so large multi-site jobs will hit rate limits faster.
 - The connector currently uses only the site-level API, not the country-level endpoints documented by Renewables.ninja.
 - Additional upstream parameters may be passed through without local validation.
-- If upstream parameters are used to request non-hourly aggregates, MAC still currently labels temporal resolution as `hourly` in `dimensions`.
+- If upstream parameters are used to request non-hourly aggregates, MACK still currently labels temporal resolution as `hourly` in `dimensions`.
 - The upstream service limits each request to one year, so longer spans need to be split into multiple requests outside the current connector.
 
 ## Example Request
@@ -181,7 +181,7 @@ request <- list(
   )
 )
 
-result <- run_mac(request)
+result <- run_mack(request)
 ```
 
 ## External Links

@@ -1,17 +1,17 @@
-# Extending MAC
+# Extending MACK
 
 ## 1. Purpose of This Guide
 
-This guide documents the current logic of the MOSAIC API Connector (MAC) and sets out the working standard for adding new API connectors to the codebase.
+This guide documents the current logic of the MOSAIC API Connector (MACK) and sets out the working standard for adding new API connectors to the codebase.
 
-The intended audience is the MOSAIC project team and any contributor extending MAC with additional external data sources. In practical terms, the guide is meant to support future connector development and help MAC to streamline and standardise the production of Starter Data Kits.
+The intended audience is the MOSAIC project team and any contributor extending MACK with additional external data sources. In practical terms, the guide is meant to support future connector development and help MACK to streamline and standardise the production of Starter Data Kits.
 
 
-## 2. Current MAC Runtime Logic
+## 2. Current MACK Runtime Logic
 
-The core operations of MAC are centred on a single entry point, `run_mac()`, defined in `main.R`. This loads shared runtime files (on first use), processes the request object from the user (which API to call, what parameters to request, etc.), resolves authentication keys (if needed), and then passes the main work to `broker_fetch()`.
+The core operations of MACK are centred on a single entry point, `run_mack()`, defined in `main.R`. This loads shared runtime files (on first use), processes the request object from the user (which API to call, what parameters to request, etc.), resolves authentication keys (if needed), and then passes the main work to `broker_fetch()`.
 
-Before any API-specific work is attempted, MAC validates the top-level request structure through `validate_request()`. At minimum, a valid request must contain a `source` value and a `params` list. If an `output` block is provided, it is also checked for supported formats and a valid file specification. This ensures that connector code receives a request in a consistent top-level shape.
+Before any API-specific work is attempted, MACK validates the top-level request structure through `validate_request()`. At minimum, a valid request must contain a `source` value and a `params` list. If an `output` block is provided, it is also checked for supported formats and a valid file specification. This ensures that connector code receives a request in a consistent top-level shape.
 
 The dispatch step is handled by `broker_fetch()`. This function inspects `request$source`, routes the request to the selected connector, and calls the connector-specific stages in sequence:
 
@@ -19,11 +19,11 @@ The dispatch step is handled by `broker_fetch()`. This function inspects `reques
 2. `fetch_<connector>()`
 3. `normalize_<connector>_result()`
 
-After the connector returns its normalized result, the dispatcher validates that the shared MAC result structure has been respected and then stamps the `schema_version`. If the original request includes a valid output specification, `run_mac()` also writes the result to disk after dispatch completes. 
+After the connector returns its normalized result, the dispatcher validates that the shared MACK result structure has been respected and then stamps the `schema_version`. If the original request includes a valid output specification, `run_mack()` also writes the result to disk after dispatch completes. 
 
 To summarise:
-- The core of MAC is responsible for validating that a request has a valid structure, defining the schema structure, and exporting results; so these do not need to be handled within a connector.
-- Each individual connector is responsible for validating that the `params` of the request object match the needs of the API, connecting to the API and receiving the result (with any necessary authentication), and normalizing the result into the MAC schema (including the possibility of simple data transformations such as unit conversion or aggregation).
+- The core of MACK is responsible for validating that a request has a valid structure, defining the schema structure, and exporting results; so these do not need to be handled within a connector.
+- Each individual connector is responsible for validating that the `params` of the request object match the needs of the API, connecting to the API and receiving the result (with any necessary authentication), and normalizing the result into the MACK schema (including the possibility of simple data transformations such as unit conversion or aggregation).
 
 
 ## 3. Existing Connector Architecture
@@ -36,7 +36,7 @@ Each connector is responsible for source-specific parameter handling, request ex
 
 This pattern gives each connector a recognisable shape while still allowing source-specific helper functions where needed. For example, helper functions may be used for request construction, payload parsing, token retrieval, timestamp normalization, unit extraction, or aggregation logic.
 
-The MAC dispatcher retains two responsibilities that are intentionally not delegated to connectors. First, it owns source routing. New sources are explicitly registered in the dispatcher, rather than discovered dynamically. Second, it owns `schema_version`, which means connector normalizers must not set that field themselves.
+The MACK dispatcher retains two responsibilities that are intentionally not delegated to connectors. First, it owns source routing. New sources are explicitly registered in the dispatcher, rather than discovered dynamically. Second, it owns `schema_version`, which means connector normalizers must not set that field themselves.
 
 Two connectors are implemented at the time of launch to illustrate how this architecture can accommodate quite different APIs.
 
@@ -44,23 +44,23 @@ The World Bank connector is relatively simple and largely request-response orien
 
 The Renewables.ninja connector demonstrates a more involved case. It retrieves an API token needed for authentication, normalizes user parameters by applying defaults where needed, performs one API call per site, parses either JSON or CSV payloads, and can return either site-level data or a summed series across sites.
 
-Taken together, these two examples show the intended architectural boundary in MAC: connectors should share the same lifecycle and top-level output object, but they do not need to force all APIs into an identical internal data layout.
+Taken together, these two examples show the intended architectural boundary in MACK: connectors should share the same lifecycle and top-level output object, but they do not need to force all APIs into an identical internal data layout.
 
 
 ## 4. Current Working Standard for New API Connectors
 
-New connectors should fit into the established validator-fetch-normalizer flow, return the shared top-level MAC output object, and integrate with the existing dispatcher and validation logic. Beyond that, the codebase intentionally leaves room for source-specific design choices.
+New connectors should fit into the established validator-fetch-normalizer flow, return the shared top-level MACK output object, and integrate with the existing dispatcher and validation logic. Beyond that, the codebase intentionally leaves room for source-specific design choices.
 
 That flexibility is important because the APIs that could be useful to integrate are likely to be diverse. Some sources may return annual scalar indicators. Others may return hourly time series, multiple spatial points, scenario bundles, tabular metadata, or nested structures that do not map neatly onto a single canonical format.
 
-In this project, MAC is best understood as an intermediate acquisition step in the workflow. Its role is to make it easy to pull structured data from external sources into a consistent top-level container. More complex reshaping, aggregation, reconciliation, or model-specific formatting can and should remain downstream where appropriate.
+In this project, MACK is best understood as an intermediate acquisition step in the workflow. Its role is to make it easy to pull structured data from external sources into a consistent top-level container. More complex reshaping, aggregation, reconciliation, or model-specific formatting can and should remain downstream where appropriate.
 
 For that reason, the project standard should be read as follows:
 
 - connectors should be easy to understand and test
 - connector inputs should be validated before network calls are made (where practical)
 - request details should be traceable in the output (to maintain data provenance and transparency)
-- the top-level MAC result object should remain consistent
+- the top-level MACK result object should remain consistent
 - the internal structure of `data`, `units`, and parts of `dimensions` may vary when the source demands it
 
 Clear separation of concerns is encouraged, but not an absolute rule. For simple APIs, a lightweight implementation may be sufficient. For more complex APIs, additional helper functions may be appropriate. The standard should support both cases.
@@ -107,22 +107,22 @@ Where helpful, connectors may normalize user parameters before request execution
 
 A dedicated request-builder helper is encouraged whenever it makes the final API call easier to understand or test. The World Bank connector uses `build_world_bank_request()` to make URL and query assembly explicit. This gives both developers and tests a stable point at which to inspect the final request shape. For a very simple connector, request construction may remain inside the fetch function if that keeps the implementation clearer.
 
-Any defaults, aliases, parameter transformations, or normalization rules should be documented. Contributors should be able to see not only what inputs the connector accepts, but also what changes MAC may apply before sending the final request.
+Any defaults, aliases, parameter transformations, or normalization rules should be documented. Contributors should be able to see not only what inputs the connector accepts, but also what changes MACK may apply before sending the final request.
 
 ## 7. Standard Request and Output Expectations
 
-At request level, MAC expects three common top-level fields:
+At request level, MACK expects three common top-level fields:
 
 - `source`: the connector name to route to
 - `params`: a list of connector-specific parameters
 - `output`: an optional export block
 
-The `params` block is connector-specific. This is where diversity between APIs belongs. Top-level standardisation in MAC is primarily about dispatch and result handling, not about forcing all APIs to expose the same parameter vocabulary.
+The `params` block is connector-specific. This is where diversity between APIs belongs. Top-level standardisation in MACK is primarily about dispatch and result handling, not about forcing all APIs to expose the same parameter vocabulary.
 
-At result level, connectors are expected to return the shared MAC top-level object. The required fields are:
+At result level, connectors are expected to return the shared MACK top-level object. The required fields are:
 
 - `connector` identifies the source that produced the result.
-- `timestamp` records when MAC generated the result object.
+- `timestamp` records when MACK generated the result object.
 - `query` captures enough information to reconstruct what was requested from the API.
 - `data` contains the main payload returned by the connector.
 - `units` records unit information where it exists and is useful.
@@ -133,9 +133,9 @@ The optional fields are:
 - `warnings` is available for non-fatal caveats.
 - `source_metadata` stores extra upstream details that are useful for traceability but not essential to the main payload.
 
-MAC standardises the top-level container, not every internal data shape.
+MACK standardises the top-level container, not every internal data shape.
 
-This distinction is visible in the World Bank and Renewables.ninja connectors. World Bank returns a list of records. Renewables.ninja returns a column-oriented structure. Both are wrapped inside the same top-level MAC object.
+This distinction is visible in the World Bank and Renewables.ninja connectors. World Bank returns a list of records. Renewables.ninja returns a column-oriented structure. Both are wrapped inside the same top-level MACK object.
 
 For future connectors, the following conventions should be treated as guidance:
 
@@ -145,7 +145,7 @@ For future connectors, the following conventions should be treated as guidance:
 - Aggregated or multi-site results should indicate clearly whether they represent individual components or a combined series.
 - If flattening a source-specific structure would remove useful meaning, it is acceptable to preserve more of the source shape and explain it through `dimensions`, `query`, or `source_metadata`.
 
-This flexible approach is deliberate. MAC should produce data that is easy to inspect and reuse, but it should not try to anticipate every downstream transformation a modeller might want. Users may later reshape the data for a specific model, database, or reporting pipeline. MAC should make the acquisition of data easier, not try to build entire bespoke data processing pipelines.
+This flexible approach is deliberate. MACK should produce data that is easy to inspect and reuse, but it should not try to anticipate every downstream transformation a modeller might want. Users may later reshape the data for a specific model, database, or reporting pipeline. MACK should make the acquisition of data easier, not try to build entire bespoke data processing pipelines.
 
 ## 8. Authentication, Secrets, and External Dependency Handling
 
@@ -161,7 +161,7 @@ Where possible, tests should avoid depending on live credentials or live network
 
 ## 9. Error Handling and Result Normalization
 
-MAC's current error-handling model is straightforward and should continue to guide new connectors.
+MACK's current error-handling model is straightforward and should continue to guide new connectors.
 
 Invalid input should fail before transport. If a request is malformed or internally inconsistent, the error should be raised locally during validation rather than after an API call has already been attempted.
 
@@ -179,7 +179,7 @@ In short, connectors should normalise enough to make the data usable and consist
 
 The repository provides a testing strategy for the existing connectors, and new connectors should follow the same pattern.
 
-Current tests cover top-level request validation, utility functions, export logic, dispatcher behaviour, and connector-specific logic such as parameter validation, request building, payload parsing, fetch wrappers, and normalization. This is a strong base because it tests both the common MAC contract and the specific behaviour of each connector.
+Current tests cover top-level request validation, utility functions, export logic, dispatcher behaviour, and connector-specific logic such as parameter validation, request building, payload parsing, fetch wrappers, and normalization. This is a strong base because it tests both the common MACK contract and the specific behaviour of each connector.
 
 For a new connector, the minimum expected test set should include:
 
@@ -187,18 +187,18 @@ For a new connector, the minimum expected test set should include:
 2. Tests for request construction or fetch preparation, where that logic exists separately.
 3. Tests for response parsing and normalization.
 4. Tests for API error handling and malformed payload handling.
-5. At least one dispatch-level or `run_mac()`-level test showing that the connector can be invoked through the standard MAC path.
+5. At least one dispatch-level or `run_mack()`-level test showing that the connector can be invoked through the standard MACK path.
 
 The current codebase also uses dedicated HTTP wrapper functions to support deterministic testing without relying on live services. That pattern should continue. Unit tests should focus on connector logic and contract compliance, not on whether an external service happens to be reachable during test execution.
 
 A new connector should be treated as ready for inclusion when the following conditions are met:
 
-- the connector is registered and callable through the standard MAC flow
+- the connector is registered and callable through the standard MACK flow
 - its parameters are validated to a reasonable level before network calls
-- it returns the expected MAC top-level structure
+- it returns the expected MACK top-level structure
 - any authentication requirements are implemented clearly if needed
 - its output is traceable through `query`, `dimensions`, and optional metadata
 - source-specific payload choices are documented
 - automated tests cover the main success and failure cases
 
-This acceptance threshold is intentionally practical. It aims to ensure maintainability and consistency without preventing MAC from supporting a wide range of data sources and response formats.
+This acceptance threshold is intentionally practical. It aims to ensure maintainability and consistency without preventing MACK from supporting a wide range of data sources and response formats.

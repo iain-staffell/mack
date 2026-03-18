@@ -3,7 +3,7 @@
 # Runnable Renewables.ninja solar PV example:
 # - loads broker runtime through main.R
 # - checks for secrets file
-# - executes run_mac()
+# - executes run_mack()
 
 if (!requireNamespace("here", quietly = TRUE)) {
   stop("Package 'here' is required. Install with install.packages('here').", call. = FALSE)
@@ -46,7 +46,7 @@ request <- list(
   )
 )
 
-result <- run_mac(request, secrets_path = secrets_path)
+result <- run_mack(request, secrets_path = secrets_path)
 cat("Renewables.ninja solar PV example completed.\n")
 cat("Rows returned:", length(result$data$value), "\n")
 cat("Output file:", request$output$file, "\n")
