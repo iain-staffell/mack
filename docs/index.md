@@ -20,3 +20,4 @@ For contributor guidance on extending MACK, see [Extending MACK](_extending_mack
 
 - [World Bank connector](world_bank.md)
 - [Renewables.ninja connector](renewables_ninja.md)
+- [Eurostat connector](eurostat.md)

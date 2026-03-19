@@ -29,7 +29,7 @@ validate_request <- function(request) {
 #' @param source Character source name from `request$source`.
 #' @return Invisibly returns `TRUE` when source is valid; otherwise errors.
 validate_request_source <- function(source) {
-  supported_sources <- c("world_bank", "renewables_ninja")
+  supported_sources <- c("world_bank", "renewables_ninja", "eurostat")
 
   if (!is.character(source) || length(source) != 1L || !nzchar(source)) {
     stop("request$source must be a non-empty character scalar.", call. = FALSE)

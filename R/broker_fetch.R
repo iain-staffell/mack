@@ -29,6 +29,10 @@ broker_fetch <- function(request, secrets_path = "config/secrets.yaml", schema_v
     token <- get_renewables_ninja_token(secrets_path = secrets_path)
     raw_result <- fetch_renewables_ninja(params, token = token)
     result <- normalize_renewables_ninja_result(raw_result, params)
+  } else if (identical(source, "eurostat")) {
+    validate_eurostat_params(params)
+    raw_result <- fetch_eurostat(params)
+    result <- normalize_eurostat_result(raw_result, params)
   } else {
     stop("Unsupported source in request$source: ", source, call. = FALSE)
   }

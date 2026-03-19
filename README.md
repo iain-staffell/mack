@@ -11,6 +11,7 @@ MACK is a lightweight connector written in R.  It fetches data from external API
 Currently, connectors are implemented for:
 - [World Bank Indicators](docs/world_bank.md)
 - [Renewables.ninja](docs/renewables_ninja.md)
+- [Eurostat Statistics API](docs/eurostat.md)
 
 
 ## Quick start guide
@@ -157,6 +158,12 @@ The World Bank Indicators connector provides quick access to development and inf
 The Renewables.ninja connector provides quick access to weather-driven wind and solar generation profiles which capture the real-world spatial and temporal variation in output. Several individual locations can be simulated within a single request, and aggregated together to form zonal or regional outputs.  The wind and solar site configuration (technology, hub height, orientation) can be specified, with standard defaults applied if none are given.  Simulations are available at hourly resolution from 1980 to 2024.
 
 Renewables time series are returned in a column-oriented `data` structure.  Results can be requested for an individual site, or the sum across several sites.
+
+### [Eurostat Statistics API](docs/eurostat.md)
+
+The Eurostat connector provides access to Eurostat's Statistics API using dataset codes and named dimension filters. It returns row-based observations with one field per returned Eurostat dimension, which makes it suitable for datasets such as household energy prices, population series, or other tabular Eurostat outputs once the dataset code and filter dimensions are known.
+
+An optional `aggregate_time = "annual_mean"` mode is included for cases like semesterly energy price datasets where annual averages are more useful than the raw reporting periods.
 
 ### Authentication
 

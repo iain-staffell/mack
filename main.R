@@ -107,6 +107,7 @@ load_broker_runtime <- function(force = FALSE) {
     file.path(root_path, "R", "export_result.R"),
     file.path(root_path, "R", "connectors", "world_bank.R"),
     file.path(root_path, "R", "connectors", "renewables_ninja.R"),
+    file.path(root_path, "R", "connectors", "eurostat.R"),
     file.path(root_path, "R", "broker_fetch.R")
   )
 

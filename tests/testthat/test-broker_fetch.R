@@ -87,3 +87,31 @@ testthat::test_that("broker_fetch routes renewables and injects schema version",
   testthat::expect_equal(out$connector, "renewables_ninja")
   testthat::expect_equal(out$schema_version, "9.9.9")
 })
+
+testthat::test_that("broker_fetch routes eurostat and injects schema version", {
+  req <- list(
+    source = "eurostat",
+    params = list(dataset_code = "nrg_pc_204", filters = list(geo = "DE"))
+  )
+
+  out <- with_temp_bindings(
+    list(
+      validate_eurostat_params = function(params) invisible(TRUE),
+      fetch_eurostat = function(params) list(raw = TRUE),
+      normalize_eurostat_result = function(raw_result, params) {
+        list(
+          connector = "eurostat",
+          timestamp = "2026-01-01T00:00:00Z",
+          query = list(),
+          data = list(),
+          units = NULL,
+          dimensions = list(temporal = list(), spatial = list())
+        )
+      }
+    ),
+    broker_fetch(req, schema_version = "2.0.0")
+  )
+
+  testthat::expect_equal(out$connector, "eurostat")
+  testthat::expect_equal(out$schema_version, "2.0.0")
+})
