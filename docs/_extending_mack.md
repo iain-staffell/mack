@@ -1,13 +1,34 @@
 # Extending MACK
 
-## 1. Purpose of This Guide
+It is possible to extend MACK by adding connectors to new APIs.  This page offers two routes to doing this, using coding agents such as Codex / Claude Code, or manually.
+
+
+## Using Coding Agents
+
+If you work with with a coding tool such as Codex or Claude Code, you can usually ask for a new connector in plain language and let the agent handle the repository-specific details. In this repository, those agent instructions live in `AGENTS.md`, which they will likely read anyway.
+
+In practice, the workflow can be as simple as:
+
+1. Clone the repository and open it locally.
+2. Start your coding agent in the repository root.
+3. Ask for the connector you want, for example:
+   "Please produce me a connector for Eurostat and create an example file that fetches the annual average gas and electricity prices for household consumers across all countries for 2017 to 2024."
+
+The `AGENTS.md` file gives complete guidance on how the tool should do this.  This includes searching for the API documentation (so that you don't need to research the details), writing the connector, writing unit tests (to ensure the connector works), and writing example documentation to go with it. 
+
+If you create a useful new connector, please open a pull request so we can review it and help grow MACK together.
+
+
+## Manually adding connectors
+
+### 1. Purpose of This Guide
 
 This guide documents the current logic of the MOSAIC API Connector (MACK) and sets out the working standard for adding new API connectors to the codebase.
 
 The intended audience is the MOSAIC project team and any contributor extending MACK with additional external data sources. In practical terms, the guide is meant to support future connector development and help MACK to streamline and standardise the production of Starter Data Kits.
 
 
-## 2. Current MACK Runtime Logic
+### 2. Current MACK Runtime Logic
 
 The core operations of MACK are centred on a single entry point, `run_mack()`, defined in `main.R`. This loads shared runtime files (on first use), processes the request object from the user (which API to call, what parameters to request, etc.), resolves authentication keys (if needed), and then passes the main work to `broker_fetch()`.
 
@@ -26,7 +47,7 @@ To summarise:
 - Each individual connector is responsible for validating that the `params` of the request object match the needs of the API, connecting to the API and receiving the result (with any necessary authentication), and normalizing the result into the MACK schema (including the possibility of simple data transformations such as unit conversion or aggregation).
 
 
-## 3. Existing Connector Architecture
+### 3. Existing Connector Architecture
 
 Each connector is responsible for source-specific parameter handling, request execution, response parsing, and output normalization. The common public pattern is:
 
@@ -47,7 +68,7 @@ The Renewables.ninja connector demonstrates a more involved case. It retrieves a
 Taken together, these two examples show the intended architectural boundary in MACK: connectors should share the same lifecycle and top-level output object, but they do not need to force all APIs into an identical internal data layout.
 
 
-## 4. Current Working Standard for New API Connectors
+### 4. Current Working Standard for New API Connectors
 
 New connectors should fit into the established validator-fetch-normalizer flow, return the shared top-level MACK output object, and integrate with the existing dispatcher and validation logic. Beyond that, the codebase intentionally leaves room for source-specific design choices.
 
@@ -66,7 +87,7 @@ For that reason, the project standard should be read as follows:
 Clear separation of concerns is encouraged, but not an absolute rule. For simple APIs, a lightweight implementation may be sufficient. For more complex APIs, additional helper functions may be appropriate. The standard should support both cases.
 
 
-## 5. Recommended Onboarding Checklist for a New API Connector
+### 5. Recommended Onboarding Checklist for a New API Connector
 
 The following checklist summarises the practical repository changes needed to add a new connector.
 
@@ -95,7 +116,7 @@ The following checklist summarises the practical repository changes needed to ad
    Create a corresponding documentation file under `docs/connectors/`, following the examples already there. If the connector applies defaults, uses a particular data layout, or preserves source-specific structure for good reason, that choice should be made explicit in this user-facing documentation.
 
 
-## 6. Parameter Validation and Query Construction Rules
+### 6. Parameter Validation and Query Construction Rules
 
 Parameter validation should happen before any network call is made. The main purpose is to fail early on invalid input, produce clearer error messages, and avoid unnecessary external requests.
 
@@ -109,7 +130,7 @@ A dedicated request-builder helper is encouraged whenever it makes the final API
 
 Any defaults, aliases, parameter transformations, or normalization rules should be documented. Contributors should be able to see not only what inputs the connector accepts, but also what changes MACK may apply before sending the final request.
 
-## 7. Standard Request and Output Expectations
+### 7. Standard Request and Output Expectations
 
 At request level, MACK expects three common top-level fields:
 
@@ -147,7 +168,7 @@ For future connectors, the following conventions should be treated as guidance:
 
 This flexible approach is deliberate. MACK should produce data that is easy to inspect and reuse, but it should not try to anticipate every downstream transformation a modeller might want. Users may later reshape the data for a specific model, database, or reporting pipeline. MACK should make the acquisition of data easier, not try to build entire bespoke data processing pipelines.
 
-## 8. Authentication, Secrets, and External Dependency Handling
+### 8. Authentication, Secrets, and External Dependency Handling
 
 Some APIs require authentication and some do not.
 
@@ -159,7 +180,7 @@ Connectors should also make their external dependencies explicit. That includes 
 
 Where possible, tests should avoid depending on live credentials or live network calls. The current code already supports this approach by using HTTP wrapper functions that can be mocked in tests.
 
-## 9. Error Handling and Result Normalization
+### 9. Error Handling and Result Normalization
 
 MACK's current error-handling model is straightforward and should continue to guide new connectors.
 
@@ -175,7 +196,7 @@ The optional `warnings` field is available for cases where the connector complet
 
 In short, connectors should normalise enough to make the data usable and consistent at top level, but not so aggressively that important source-specific meaning is lost.
 
-## 10. Testing and Acceptance Criteria
+### 10. Testing and Acceptance Criteria
 
 The repository provides a testing strategy for the existing connectors, and new connectors should follow the same pattern.
 

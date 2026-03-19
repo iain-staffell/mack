@@ -145,6 +145,8 @@ Two connectors are currently available.
 
 A detailed guide has been written on how to [extend MACK by writing connectors to additional APIs](docs/_extending_mack.md).
 
+New connectors can also be created quickly with coding agents such as Codex or Claude Code by opening this repository locally and asking for the connector you want in plain language.
+
 
 ### [World Bank Indicators](docs/world_bank.md)
 
