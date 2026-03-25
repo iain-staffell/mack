@@ -195,10 +195,6 @@ Testing:
 - Missing data values: preserved as `NULL`/`NA` in normalized output where appropriate.
 
 
-## License
-
-BSD 3-Clause.
-
 ## Contact
 
 [Iain Staffell](mailto:i.staffell@imperial.ac.uk), Imperial College London
