@@ -151,7 +151,7 @@ New connectors can also be created quickly with coding agents such as Codex or C
 
 ### [World Bank Indicators](docs/world_bank.md)
 
-The World Bank Indicators connector provides quick access to development and infrastructure metrics, for example, GDP (`NY.GDP.MKTP.KD`), GDP growth (`NY.GDP.MKTP.KD.ZG`), electric power consumption (`EG.USE.ELEC.KH`), access to electricity (`EG.ELC.ACCS.ZS`), access to clean fuels and technologies for cooking (`EG.CFT.ACCS.ZS`), electricity transmission and distribution losses (`EG.ELC.LOSS.ZS`), and the electricity generation mix from coal (`EG.ELC.COAL.ZS`), gas (`EG.ELC.NGAS.ZS`), nuclear (`EG.ELC.NUCL.ZS`), hydro (`EG.ELC.HYRO.ZS`), and non-hydro renewables (`EG.ELC.RNWX.ZS`). Indicators are typically annual country-aggregates, available from 1960 (with better availability from 1990 onwards). 
+The World Bank Indicators connector provides quick access to development and infrastructure metrics, for example, GDP, GDP growth, electric power consumption, access to electricity, access to clean fuels and technologies for cooking, and the electricity generation mix. Indicators are typically annual country-aggregates, available from 1960 (with better availability from 1990 onwards).  See [World Bank Indicators](https://data.worldbank.org/indicator?tab=all) for a full list of the indicators available.
 
 ### [Renewables.ninja](docs/renewables_ninja.md)
 
